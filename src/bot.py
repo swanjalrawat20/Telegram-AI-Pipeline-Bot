@@ -1,6 +1,10 @@
 import os
 from dotenv import load_dotenv
-
+from hf_pipelines import analyze_sentiment
+from hf_pipelines import summarize_text
+from hf_pipelines import generate_text
+from hf_pipelines import translate_text
+from hf_pipelines import classify_text
 from telegram import Update
 from telegram.constants import ChatAction
 from telegram.ext import (
@@ -69,6 +73,79 @@ async def about(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await update.message.reply_text(about_text)
 
+async def sentiment(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    if not context.args:
+        await update.message.reply_text(
+            "Usage:\n/sentiment I love AI"
+        )
+        return
+
+    text = " ".join(context.args)
+
+    result = analyze_sentiment(text)
+
+    await update.message.reply_text(result)
+
+async def summarize(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    if not context.args:
+        await update.message.reply_text(
+            "Usage:\n/summarize <your text>"
+        )
+        return
+
+    text = " ".join(context.args)
+
+    summary = summarize_text(text)
+
+    await update.message.reply_text(
+        f"📝 Summary:\n\n{summary}"
+    )
+
+async def generate(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    if not context.args:
+        await update.message.reply_text(
+            "Usage:\n/generate <your prompt>"
+        )
+        return
+
+    prompt = " ".join(context.args)
+
+    result = generate_text(prompt)
+
+    await update.message.reply_text(result)
+
+async def translate(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    if not context.args:
+        await update.message.reply_text(
+            "Usage:\n/translate Hello everyone"
+        )
+        return
+
+    text = " ".join(context.args)
+
+    translated = translate_text(text)
+
+    await update.message.reply_text(
+        f"🌍 French Translation:\n\n{translated}"
+    )
+
+async def classify(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    if not context.args:
+        await update.message.reply_text(
+            "Usage:\n/classify <your text>"
+        )
+        return
+
+    text = " ".join(context.args)
+
+    result = classify_text(text)
+
+    await update.message.reply_text(result)
 
 async def clear(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
@@ -117,6 +194,11 @@ def main():
     app.add_handler(CommandHandler("help", help_command))
     app.add_handler(CommandHandler("about", about))
     app.add_handler(CommandHandler("clear", clear))
+    app.add_handler(CommandHandler("sentiment", sentiment))
+    app.add_handler(CommandHandler("summarize", summarize))
+    app.add_handler(CommandHandler("generate", generate))
+    app.add_handler(CommandHandler("translate", translate))
+    app.add_handler(CommandHandler("classify", classify))
 
     # AI Chat
     app.add_handler(
